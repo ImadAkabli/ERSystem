@@ -38,6 +38,8 @@ int main() {
 	theQueue = PQAppend(theQueue, thePatient);
 	while(!PQEmpty(theQueue)){
 		printf("Enter an action; 'a' for arrive, 'n' for next: ");
+		// A for append
+		// N for delete 
 		scanf("%c", &action);
 		switch(action) {
 			case 'a': 
