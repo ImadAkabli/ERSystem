@@ -6,61 +6,64 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "patientqueue.h"  
+#include "patient_queue.h"
+
 
 // Global time counter, is incremented after each operation.
 int time = 0;
+int tree_size = 20;
 
 // Create a new patient record, by reading values from the keyboard.
-Patient * getPatient() {
-	Patient *newPatient = (Patient *) malloc ( sizeof(Patient));
+patient getPatient() {
+  patient P;
 	printf("Enter patient name:  ");
-	scanf("%s", newPatient->name);
+	scanf("%s", P.name);
 	printf("Enter patient ID:    ");
-	scanf("%d", &newPatient->patientID);
+	scanf("%d", &P.patientID);
 	printf("Enter severity (1-4):");
-	scanf("%d", &newPatient->severity);
-	newPatient->arrivalTime = time;
-	return newPatient;
+	scanf("%d", &P.severity);
+	P.arrivalTime = time;
+	return P;
 	}
 
 // Main program, reads one patient, and then processes patients until
 // the queue is empty.
 int main() {
-	PatientQueue *theQueue = newPQ(4);
-	Patient *thePatient;
+    patient patients[tree_size];
+    patient cases;
 	char action;
 	int time = 0;
 	
-	thePatient = getPatient();
+	cases = getPatient();
 	// If heap is empty NewPQ
 	// Else PQAppend
-	theQueue = PQAppend(theQueue, thePatient);
-	while(!PQEmpty(theQueue)){
+  append(patients, cases);
+	while(PQEmpty(patients) == -1){
+    patients[0].severity = 99;
 		printf("Enter an action; 'a' for arrive, 'n' for next: ");
 		// A for append
 		// N for delete 
-		scanf("%c", &action);
+		scanf(" %c", &action);
 		switch(action) {
 			case 'a': 
-				if(PQFull(theQueue)) {
+				if(PQFull(patients) == -1) {
 					printf("Too many patients!  Go somewhere else.\n");
 					break;
 					}
-				thePatient = getPatient();
-				theQueue = PQAppend(theQueue, thePatient);
+				cases = getPatient();
+                append(patients, cases);
 				break;
 			case 'n': 
-				if(PQEmpty(theQueue)) {
+				if(PQEmpty(patients) == -1) {
 					printf("No patients!  Take a break.\n");
 					break;
 					}
-				thePatient = PQMaxServe(&theQueue);
-				printf("Patient %s (%d, severity %d) helped after waiting %d.\n", 
-					thePatient->name, thePatient->patientID, 
-					thePatient->severity, time - thePatient->arrivalTime);
+				build_max_heap(patients);
+				cases = max_severity(patients);
+				printf("patient %s (%d, severity %d) helped after waiting %d.\n", cases.name, cases.patientID, 
+					cases.severity, cases.arrivalTime);
 			}
 		printf("Queue at time %d:\n", time++);
-		printPQ(theQueue);
+		print_heap(patients);
 	}
 }
